@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Snail Eyes - Proof of Concept</title>
+    <script>
+      const w = 640;
+      const h = 480;
+      function setup() {
+        cam = document.getElementById("cam");
+        fine = document.getElementById("fine");
+        canvas = document.getElementById("canvas");
+        draw = canvas.getContext('2d');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({video:{
+            width: { ideal: w },
+            height: { ideal: h }
+          }}).then(function(stream) {
+            cam.srcObject = stream;
+            cam.play();
+          });
+        }
+        setInterval(snap, 100);
+      }
+      function snap() {
+        draw.drawImage(cam,0,0,w,h);
+        pixels = draw.getImageData(0,0,w,h);
+        f = parseInt(fine.value);
+        px = undefined;
+        for (x=0; x<w; x+=f) {
+          for (y=0; y<h; y+=f) {
+            px = pxl(x,y);
+            draw.fillStyle = rgb(
+              255*Math.round(2*px.r/255)/2,
+              255*Math.round(2*px.g/255)/2,
+              255*Math.round(2*px.b/255)/2
+            );
+            draw.fillRect(x,y,f,f);
+          }
+        }
+      }
+      function pxl(X,Y) { // Returns colour of pixel in JSON
+        return {
+          r : pixels.data[4*w*Y+4*X],
+          g : pixels.data[4*w*Y+4*X+1],
+          b : pixels.data[4*w*Y+4*X+2],
+          rgb : "rgb("+pixels.data[4*w*Y+4*X]+','+pixels.data[4*w*Y+4*X+1]+','+pixels.data[4*w*Y+4*X+2]+')'
+        };
+      }
+      function rgb(R,G,B) {
+        return "rgb("+R+','+G+','+B+')';
+      }
+    </script>
+  </head>
+  <body onload="setup()">
+    <video id="cam" width="640" height="480" autoplay></video>
+    <br>
+    <label for="fine">Processing Square Size:</label>
+    <input type="number" id="fine" min="1" max="100" value="5">
+    <br>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </body>
+</html>
