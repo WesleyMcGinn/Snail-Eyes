@@ -10,6 +10,7 @@
         fine = document.getElementById("fine");
         canvas = document.getElementById("canvas");
         draw = canvas.getContext('2d');
+        graph = document.getElementById("graph").getContext('2d');
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           navigator.mediaDevices.getUserMedia({video:{
             width: { ideal: w },
@@ -22,6 +23,7 @@
         setInterval(snap, 100);
       }
       function snap() {
+        points = [];
         draw.drawImage(cam,0,0,w,h);
         pixels = draw.getImageData(0,0,w,h);
         f = parseInt(fine.value);
@@ -29,13 +31,24 @@
         for (x=0; x<w; x+=f) {
           for (y=0; y<h; y+=f) {
             px = pxl(x,y);
-            draw.fillStyle = rgb(
-              255*Math.round(2*px.r/255)/2,
-              255*Math.round(2*px.g/255)/2,
-              255*Math.round(2*px.b/255)/2
+            col = hsl(
+              px.r,
+              px.g,
+              px.b
             );
+            points.push(col);
+            draw.fillStyle = col.hsl();
             draw.fillRect(x,y,f,f);
           }
+        }
+        // Graph:
+        for (i=0; i<=360; i++) {
+          graph.fillStyle = "hsl("+i+",100%,50%)";
+          graph.fillRect(2*i,0,2,200);
+        }
+        for (i in points) {
+          graph.fillStyle = "hsl(0,0%,"+(100-points[i].l)+"%)";
+          graph.fillRect(2*points[i].h,200-2*points[i].s,2,2);
         }
       }
       function pxl(X,Y) { // Returns colour of pixel in JSON
@@ -49,6 +62,31 @@
       function rgb(R,G,B) {
         return "rgb("+R+','+G+','+B+')';
       }
+      function hsl(r, g, b) {
+        var max = Math.max(r,g,b)/255;
+        var delta = max - Math.min(r,g,b)/255;
+        var h;
+        if (delta == 0) {
+          h = 0;
+        } else if (max == r/255) {
+          h = 60 * (((g/255 - b/255) / delta) % 6);
+        } else if (max == g/255) {
+          h = 60 * (((b/255 - r/255) / delta) + 2);
+        } else {
+          h = 60 * (((r/255 - g/255) / delta) + 4);
+        }
+        while (h < 0) { h += 360; } while (h >= 360) { h-= 360; }
+        var s = (max == 0) ? 0 : (100*delta/max);
+        var l = 100*max;
+        return {
+          h : Math.round(h),
+          s : Math.round(s),
+          l : Math.round(l),
+          hsl : function() {
+            return "hsl("+Math.round(this.h)+','+Math.round(this.s)+'%,'+Math.round(this.l)+'%)';
+          }
+        };
+      }
     </script>
   </head>
   <body onload="setup()">
@@ -58,5 +96,6 @@
     <input type="number" id="fine" min="1" max="100" value="5">
     <br>
     <canvas id="canvas" width="640" height="480"></canvas>
+    <canvas id="graph" width="720" height="200"></canvas>
   </body>
 </html>
