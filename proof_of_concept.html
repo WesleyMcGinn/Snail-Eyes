@@ -53,7 +53,7 @@
           }
         }
         for (i in points) {
-          graph.fillStyle = "hsl(0,0%,"+(100-points[i].l)+"%)";
+          graph.fillStyle = "hsla(0,0%,100%,5%)";
           graph.fillRect(240+2.4*points[i].s*Math.cos(Math.PI*points[i].h/180),240+2.4*points[i].s*Math.sin(Math.PI*points[i].h/180),2,2);
         }
       }
