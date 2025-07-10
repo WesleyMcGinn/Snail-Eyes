@@ -23,14 +23,23 @@ var eyes = {
     return 65536*(R<0?0:R>255?255:R)+256*(G<0?0:G>255?255:G)+(B<0?0:B>255?255:B);
   },
   addPix : function(R, G, B, X, Y, cam='n') { // Adds pixel to virtual 3d database.  Set cam to 'l', 'r', or 'n' depending on whether pixel is in left camera view, right camera view, or no camera view, respectively.
-    //for (var i=0; i<)
-    this.v3d.density[this.ix(R,G,B)] += this.spread;
     if (cam == 'l') {
       this.v3d.lx[this.ix(R,G,B)].push(X);
       this.v3d.ly[this.ix(R,G,B)].push(Y);
     } else if (cam == 'r') {
       this.v3d.rx[this.ix(R,G,B)].push(X);
       this.v3d.ry[this.ix(R,G,B)].push(Y);
+    }
+    for (var i=1; i<=this.spread; i++) {
+      for (var r = R-i+1; r < R+i; r++) {
+        for (var g = G-i+1; g < G+i; g++) {
+          for (var b = B-i+1; b < B+i; b++) {
+            if (Math.min(r,g,b) >= 0 && Math.max(r,g,b) <= 255) {
+              this.v3d.density[this.ix(r,g,b)]++;
+            }
+          }
+        }
+      }
     }
   },
   max : function() { // Returns the slot in the 3D environment that holds the maximum density out of all un-blobbed slots
