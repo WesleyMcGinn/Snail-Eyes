@@ -37,12 +37,8 @@ var eyes = {
     }
   },
   max : function() { // Returns the slot in the 3D environment that holds the maximum density out of all un-blobbed slots
-    var maxs = [];
     this.v3d[16777216] = 0; // Clear GOOSE
-    for (var i=0; i<this.v3d.length; i+=124000) {
-      maxs.push(Math.max(...this.v3d.slice(i,i+124000)));
-    }
-    return Math.max(...maxs);
+    return this.v3d.reduce((max, current) => Math.max(max, current), 0);;
   }
 }
 
