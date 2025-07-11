@@ -1,42 +1,36 @@
 var eyes = {
   prepped : false,
   spread : 5,
-  prep : function(Size=255*255*255) { // Creates/resets virtual 3D environment
+  prep : function() { // Creates/resets virtual 3D environment
     if (!this.prepped) {
-      this.v3d = {
-        density : new Array(Size),
-        lx : new Array(Size),
-        ly : new Array(Size),
-        rx : new Array(Size),
-        ry : new Array(Size)
-      }
+      this.v3d = new Uint32Array(16777217),
       this.prepped = true;
     }
-    this.v3d.density.fill(0);
-    this.v3d.lx.fill([]);
-    this.v3d.ly.fill([]);
-    this.v3d.rx.fill([]);
-    this.v3d.ry.fill([]);
+    this.v3d.fill(0);
+    this.coords = {
+      lx : [],
+      ly : [],
+      rx : [],
+      ry : []
+    }
     this.blobs = [];
   },
-  ix : function(R, G, B) { // Returns the index of the cube in the arrays at position (R,G,B) in the 3D environment
-    return 65536*(R<0?0:R>255?255:R)+256*(G<0?0:G>255?255:G)+(B<0?0:B>255?255:B);
+  ix : function(R, G, B) { // Returns the index of the cube in the 3D environment at position (R,G,B)
+    return (R>=0&G>=0&B>=0&R<256&G<256&B<256)?(65536*R+256*G+B):16777216; // Slot 16777216 is the "Garbage Outward Overflow Slot Exit" (GOOSE)
   },
   addPix : function(R, G, B, X, Y, cam='n') { // Adds pixel to virtual 3d database.  Set cam to 'l', 'r', or 'n' depending on whether pixel is in left camera view, right camera view, or no camera view, respectively.
     if (cam == 'l') {
-      this.v3d.lx[this.ix(R,G,B)].push(X);
-      this.v3d.ly[this.ix(R,G,B)].push(Y);
+      this.coords.lx[this.ix(R,G,B)] = X;
+      this.coords.ly[this.ix(R,G,B)] = Y;
     } else if (cam == 'r') {
-      this.v3d.rx[this.ix(R,G,B)].push(X);
-      this.v3d.ry[this.ix(R,G,B)].push(Y);
+      this.coords.rx[this.ix(R,G,B)] = X;
+      this.coords.ry[this.ix(R,G,B)] = Y;
     }
     for (var i=1; i<=this.spread; i++) {
       for (var r = R-i+1; r < R+i; r++) {
         for (var g = G-i+1; g < G+i; g++) {
           for (var b = B-i+1; b < B+i; b++) {
-            if (Math.min(r,g,b) >= 0 && Math.max(r,g,b) <= 255) {
-              this.v3d.density[this.ix(r,g,b)]++;
-            }
+            this.v3d[this.ix(r,g,b)]++;
           }
         }
       }
@@ -44,8 +38,9 @@ var eyes = {
   },
   max : function() { // Returns the slot in the 3D environment that holds the maximum density out of all un-blobbed slots
     var maxs = [];
-    for (var i=0; i<this.v3d.density.length; i+=124000) {
-      maxs.push(Math.max(...this.v3d.density.slice(i,i+124000)));
+    this.v3d[16777216] = 0; // Clear GOOSE
+    for (var i=0; i<this.v3d.length; i+=124000) {
+      maxs.push(Math.max(...this.v3d.slice(i,i+124000)));
     }
     return Math.max(...maxs);
   }
