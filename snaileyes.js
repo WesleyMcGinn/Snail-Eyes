@@ -26,10 +26,10 @@ var eyes = {
       this.coords.rx[this.ix(R,G,B)] = X;
       this.coords.ry[this.ix(R,G,B)] = Y;
     }
-    for (var i=1; i<=this.spread; i++) {
-      for (var r = R-i+1; r < R+i; r++) {
-        for (var g = G-i+1; g < G+i; g++) {
-          for (var b = B-i+1; b < B+i; b++) {
+    for (let i=1; i<=this.spread; i++) {
+      for (let r = R-i+1; r < R+i; r++) {
+        for (let g = G-i+1; g < G+i; g++) {
+          for (let b = B-i+1; b < B+i; b++) {
             this.v3d[this.ix(r,g,b)]++;
           }
         }
@@ -38,7 +38,13 @@ var eyes = {
   },
   max : function() { // Returns the slot in the 3D environment that holds the maximum density out of all un-blobbed slots
     this.v3d[16777216] = 0; // Clear GOOSE
-    return this.v3d.reduce((max, current) => Math.max(max, current), 0);
+    let m = 0;
+    for (let i=0; i<16777216; i++) {
+      if (this.v3d[i] > m) {
+        m = this.v3d[i];
+      }
+    }
+    return m;
   }
 }
 
