@@ -113,9 +113,18 @@ var eyes = {
 console.log("Prepping...");
 eyes.prep();
 console.log("Setting...");
-for (var i=0; i<64*48; i++) {
-  eyes.addPix(Math.floor(Math.random() * 256),Math.floor(Math.random() * 256),Math.floor(Math.random() * 256),i%64,Math.floor(i/64),'l');
+
+for (let x = 0; x < 20; x++) {
+  eyes.addPix(255, 0, 0, x, 0, 'l');
 }
-console.log("Getting max...");
-var Max = eyes.max(); // Should be equal to spread value
-console.log(Max);
+for (let y = 1; y < 20; y++) {
+  for (let x=0; x < 20; x++) {
+    eyes.addPix(255, 255, 255, x, y, 'l');
+  }
+}
+console.log(eyes.density(255,255,255));
+console.log(eyes.density(255,0,0));
+
+console.log("Blobifying...");
+console.log(eyes.blobify());
+console.log(eyes.blobs);
