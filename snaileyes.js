@@ -109,22 +109,3 @@ var eyes = {
     }
   }
 }
-
-console.log("Prepping...");
-eyes.prep();
-console.log("Setting...");
-
-for (let x = 0; x < 20; x++) {
-  eyes.addPix(255, 0, 0, x, 0, 'l');
-}
-for (let y = 1; y < 20; y++) {
-  for (let x=0; x < 20; x++) {
-    eyes.addPix(255, 255, 255, x, y, 'l');
-  }
-}
-console.log(eyes.density(255,255,255));
-console.log(eyes.density(255,0,0));
-
-console.log("Blobifying...");
-console.log(eyes.blobify());
-console.log(eyes.blobs);
