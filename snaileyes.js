@@ -12,8 +12,7 @@ var eyes = {
       ly : [],
       rx : [],
       ry : []
-    }
-    this.blobs = [];
+    };
   },
   ix : function(R, G, B) { // Returns the index of the cube in the 3D environment at position (R,G,B)
     return (R>=0&G>=0&B>=0&R<256&G<256&B<256)?(65536*R+256*G+B):16777216; // Slot 16777216 is the "Garbage Outward Overflow Slot Exit" (GOOSE)
@@ -59,6 +58,55 @@ var eyes = {
       }
     }
     return m;
+  },
+  blobify : function(msl=12) { // Pulls a list of blobs from the 3D environment
+    this.blobs = [];
+    var newBlob = {};
+    var agents = [];
+    let index = 0;
+    let r, g, b, m;
+    while (true) {
+      m = this.max();
+      if (m < msl) {
+        return this.blobs.length;
+      }
+      newBlob = {};
+      index = this.v3d.indexOf(m);
+      [r,g,b] = this.xi(index);
+      newBlob.r = r;
+      newBlob.g = g;
+      newBlob.b = b;
+      newBlob.colour = "rgb("+r+','+g+','+b+')';
+      newBlob.lx = [];
+      newBlob.ly = [];
+      newBlob.rx = [];
+      newBlob.ry = [];
+      agents.push(index);
+      eyes.v3d[index] = 0;
+      while (agents.length > 0) {
+        index = agents.shift();
+        if (this.coords.lx[index] != undefined) { newBlob.lx.push(...this.coords.lx[index]); }
+        if (this.coords.ly[index] != undefined) { newBlob.ly.push(...this.coords.ly[index]); }
+        if (this.coords.rx[index] != undefined) { newBlob.rx.push(...this.coords.rx[index]); }
+        if (this.coords.ry[index] != undefined) { newBlob.ry.push(...this.coords.ry[index]); }
+        [r,g,b] = this.xi(index);
+        if (this.density(r,g,b-1) > msl) { agents.push(index-1); this.v3d[index-1] = 0; }
+        if (this.density(r,g,b+1) > msl) { agents.push(index+1); this.v3d[index+1] = 0; }
+        if (this.density(r,g-1,b) > msl) { agents.push(index-256); this.v3d[index-256] = 0; }
+        if (this.density(r,g+1,b) > msl) { agents.push(index+256); this.v3d[index+256] = 0; }
+        if (this.density(r-1,g,b) > msl) { agents.push(index-65536); this.v3d[index-65536] = 0; }
+        if (this.density(r+1,g,b) > msl) { agents.push(index+65536); this.v3d[index+65536] = 0; }
+      }
+      newBlob.lx1 = Math.min(...newBlob.lx);
+      newBlob.lx2 = Math.max(...newBlob.lx);
+      newBlob.ly1 = Math.min(...newBlob.ly);
+      newBlob.ly2 = Math.max(...newBlob.ly);
+      newBlob.rx1 = Math.min(...newBlob.rx);
+      newBlob.rx2 = Math.max(...newBlob.rx);
+      newBlob.ry1 = Math.min(...newBlob.ry);
+      newBlob.ry2 = Math.max(...newBlob.ry);
+      this.blobs.push(newBlob);
+    }
   }
 }
 
