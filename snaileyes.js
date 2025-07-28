@@ -23,11 +23,19 @@ var eyes = {
   },
   addPix : function(R, G, B, X, Y, cam='n') { // Adds pixel to virtual 3d database.  Set cam to 'l', 'r', or 'n' depending on whether pixel is in left camera view, right camera view, or no camera view, respectively.
     if (cam == 'l') {
-      this.coords.lx[this.ix(R,G,B)] = X;
-      this.coords.ly[this.ix(R,G,B)] = Y;
+      if (this.coords.lx[this.ix(R,G,B)] == undefined) {
+        this.coords.lx[this.ix(R,G,B)] = [];
+        this.coords.ly[this.ix(R,G,B)] = [];
+      }
+      this.coords.lx[this.ix(R,G,B)].push(X);
+      this.coords.ly[this.ix(R,G,B)].push(Y);
     } else if (cam == 'r') {
-      this.coords.rx[this.ix(R,G,B)] = X;
-      this.coords.ry[this.ix(R,G,B)] = Y;
+      if (this.coords.rx[this.ix(R,G,B)] == undefined) {
+        this.coords.rx[this.ix(R,G,B)] = [];
+        this.coords.ry[this.ix(R,G,B)] = [];
+      }
+      this.coords.rx[this.ix(R,G,B)].push(X);
+      this.coords.ry[this.ix(R,G,B)].push(Y);
     }
     for (let i=1; i<=this.spread; i++) {
       for (let r = R-i+1; r < R+i; r++) {
