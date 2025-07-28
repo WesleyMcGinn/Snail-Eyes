@@ -18,6 +18,9 @@ var eyes = {
   ix : function(R, G, B) { // Returns the index of the cube in the 3D environment at position (R,G,B)
     return (R>=0&G>=0&B>=0&R<256&G<256&B<256)?(65536*R+256*G+B):16777216; // Slot 16777216 is the "Garbage Outward Overflow Slot Exit" (GOOSE)
   },
+  xi : function(Ix) { // Returns the position of a cube in (R, G, B) given it's array index (Essentially opposite of ix)
+    return [Math.floor(Ix/65536), Math.floor((Ix%65536)/256), Ix%256];
+  },
   addPix : function(R, G, B, X, Y, cam='n') { // Adds pixel to virtual 3d database.  Set cam to 'l', 'r', or 'n' depending on whether pixel is in left camera view, right camera view, or no camera view, respectively.
     if (cam == 'l') {
       this.coords.lx[this.ix(R,G,B)] = X;
