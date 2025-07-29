@@ -29,18 +29,17 @@
           }}).then(function(stream) {
             cam.srcObject = stream;
             cam.play();
+            setInterval(function() {
+              draw.drawImage(cam,0,0,640,480);
+              eyes.loadImgFromCanvas(draw);
+              for (let i in eyes.blobs) {
+                draw.strokeStyle = "yellow";
+                draw.beginPath();
+                draw.rect(eyes.blobs[i].lx1, eyes.blobs[i].ly1, eyes.blobs[i].lx2 - eyes.blobs[i].lx1, eyes.blobs[i].ly2 - eyes.blobs[i].ly1);
+                draw.stroke();
+              }
+            }, 1000);
           });
-        }
-        but.onclick = function() {
-          draw.drawImage(cam,0,0,640,480);
-          eyes.loadImgFromCanvas(draw);
-          for (let i in eyes.blobs) {
-            //draw.strokeStyle = eyes.blobs[i].colour;
-            draw.strokeStyle = "yellow";
-            draw.beginPath();
-            draw.rect(eyes.blobs[i].lx1, eyes.blobs[i].ly1, eyes.blobs[i].lx2 - eyes.blobs[i].lx1, eyes.blobs[i].ly2 - eyes.blobs[i].ly1);
-            draw.stroke();
-          }
         }
       }
     </script>
@@ -48,6 +47,5 @@
   <body onload="setup()">
     <video id="cam" width="640" height="480"></video>
     <canvas id="can" width="640" height="480"></canvas>
-    <button id="but">Process</button>
   </body>
 </html>
