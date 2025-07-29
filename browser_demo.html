@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Snail Eyes System Demo</title>
+    <style>
+      body {
+        background-color: black;
+        margin: 0px;
+      }
+      canvas#can {
+        width: 100%;
+        height: auto;
+      }
+      video#cam {
+        display: none;
+      }
+    </style>
+    <script src="./snaileyes.js"></script>
+    <script>
+      function setup() {
+        cam = document.getElementById("cam");
+        can = document.getElementById("can");
+        draw = can.getContext('2d');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({video:{
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            frameRate: { ideal: 50, min: 1 }
+          }}).then(function(stream) {
+            cam.srcObject = stream;
+            cam.play();
+          });
+        }
+        but.onclick = function() {
+          draw.drawImage(cam,0,0,640,480);
+          eyes.loadImgFromCanvas(draw);
+          for (let i in eyes.blobs) {
+            //draw.strokeStyle = eyes.blobs[i].colour;
+            draw.strokeStyle = "yellow";
+            draw.beginPath();
+            draw.rect(eyes.blobs[i].lx1, eyes.blobs[i].ly1, eyes.blobs[i].lx2 - eyes.blobs[i].lx1, eyes.blobs[i].ly2 - eyes.blobs[i].ly1);
+            draw.stroke();
+          }
+        }
+      }
+    </script>
+  </head>
+  <body onload="setup()">
+    <video id="cam" width="640" height="480"></video>
+    <canvas id="can" width="640" height="480"></canvas>
+    <button id="but">Process</button>
+  </body>
+</html>
