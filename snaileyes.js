@@ -107,5 +107,15 @@ var eyes = {
       newBlob.ry2 = Math.max(...newBlob.ry);
       this.blobs.push(newBlob);
     }
+  },
+  loadImgFromCanvas(Ctx, cam='l', step=5, width=640, height=480) {
+    this.prep();
+    var pixels = Ctx.getImageData(0,0,width,height);
+    for (let y=0; y < height; y += step) {
+      for (let x=0; x < width; x += step) {
+        this.addPix(pixels.data[4*(y*width+x)], pixels.data[4*(y*width+x)+1], pixels.data[4*(y*width+x)+2], x, y, cam);
+      }
+    }
+    this.blobify();
   }
 }
