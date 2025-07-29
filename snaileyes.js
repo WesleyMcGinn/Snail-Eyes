@@ -1,6 +1,7 @@
 var eyes = {
   prepped : false,
   spread : 12,
+  mav : 170,
   prep : function() { // Creates/resets virtual 3D environment
     if (!this.prepped) {
       this.v3d = new Uint32Array(16777217),
@@ -59,7 +60,7 @@ var eyes = {
     }
     return m;
   },
-  blobify : function(msl=300) { // Pulls a list of blobs from the 3D environment
+  blobify : function(msl=220) { // Pulls a list of blobs from the 3D environment
     this.blobs = [];
     var newBlob = {};
     var agents = [];
@@ -90,12 +91,12 @@ var eyes = {
         if (this.coords.rx[index] != undefined) { newBlob.rx.push(...this.coords.rx[index]); }
         if (this.coords.ry[index] != undefined) { newBlob.ry.push(...this.coords.ry[index]); }
         [r,g,b] = this.xi(index);
-        if (this.density(r,g,b-1) > msl*0.77) { agents.push(index-1); this.v3d[index-1] = 0; }
-        if (this.density(r,g,b+1) > msl*0.77) { agents.push(index+1); this.v3d[index+1] = 0; }
-        if (this.density(r,g-1,b) > msl*0.77) { agents.push(index-256); this.v3d[index-256] = 0; }
-        if (this.density(r,g+1,b) > msl*0.77) { agents.push(index+256); this.v3d[index+256] = 0; }
-        if (this.density(r-1,g,b) > msl*0.77) { agents.push(index-65536); this.v3d[index-65536] = 0; }
-        if (this.density(r+1,g,b) > msl*0.77) { agents.push(index+65536); this.v3d[index+65536] = 0; }
+        if (this.density(r,g,b-1) > this.mav) { agents.push(index-1); this.v3d[index-1] = 0; }
+        if (this.density(r,g,b+1) > this.mav) { agents.push(index+1); this.v3d[index+1] = 0; }
+        if (this.density(r,g-1,b) > this.mav) { agents.push(index-256); this.v3d[index-256] = 0; }
+        if (this.density(r,g+1,b) > this.mav) { agents.push(index+256); this.v3d[index+256] = 0; }
+        if (this.density(r-1,g,b) > this.mav) { agents.push(index-65536); this.v3d[index-65536] = 0; }
+        if (this.density(r+1,g,b) > this.mav) { agents.push(index+65536); this.v3d[index+65536] = 0; }
       }
       newBlob.lx1 = Math.min(...newBlob.lx);
       newBlob.lx2 = Math.max(...newBlob.lx);
